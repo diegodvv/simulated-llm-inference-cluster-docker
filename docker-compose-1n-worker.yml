@@ -1,0 +1,27 @@
+x-image-def: &x-image-def
+  # build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  image: distributed_llama:latest
+# Build with `docker build -t distributed_llama:latest .`
+
+# RAM LIMIT NOT DEFINED
+services:
+  llm_ubuntu_1:
+    <<: *x-image-def
+    container_name: distributed_llama_node_1
+    tty: true
+    stdin_open: true
+    networks:
+      - llm_ubuntu_cluster_network
+    ports:
+      - "9990:9990"
+    volumes:
+      - ./models:/app/distributed-llama/models
+    command: ./dllama worker --nthreads 4
+
+networks:
+  # my_network:
+  #   driver: bridge
+  llm_ubuntu_cluster_network:
+    name: llm_ubuntu_cluster_network

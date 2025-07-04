@@ -1,0 +1,68 @@
+x-image-def: &x-image-def
+  image: distributed_llama:latest
+# Build with `docker build -t distributed_llama:latest .`
+
+# TOTAL RAM USAGE: 16 GB
+services:
+  llm_ubuntu_1:
+    <<: *x-image-def
+    container_name: distributed_llama_node_1
+    tty: true
+    stdin_open: true
+    networks:
+      - llm_ubuntu_cluster_network
+    volumes:
+      - ./models:/app/distributed-llama/models
+    deploy:
+      resources:
+        limits:
+          memory: 4GB
+
+  llm_ubuntu_2:
+    <<: *x-image-def
+    container_name: distributed_llama_node_2
+    tty: true
+    stdin_open: true
+    networks:
+      - llm_ubuntu_cluster_network
+    volumes:
+      - ./models:/app/distributed-llama/models
+    deploy:
+      resources:
+        limits:
+          memory: 4GB
+    command: ./dllama worker --nthreads 4
+  
+  llm_ubuntu_3:
+    <<: *x-image-def
+    container_name: distributed_llama_node_3
+    tty: true
+    stdin_open: true
+    networks:
+      - llm_ubuntu_cluster_network
+    volumes:
+      - ./models:/app/distributed-llama/models
+    deploy:
+      resources:
+        limits:
+          memory: 4GB
+    command: ./dllama worker --nthreads 4
+  
+  llm_ubuntu_4:
+    <<: *x-image-def
+    container_name: distributed_llama_node_4
+    tty: true
+    stdin_open: true
+    networks:
+      - llm_ubuntu_cluster_network
+    volumes:
+      - ./models:/app/distributed-llama/models
+    deploy:
+      resources:
+        limits:
+          memory: 4GB
+    command: ./dllama worker --nthreads 4
+
+networks:
+  llm_ubuntu_cluster_network:
+    name: llm_ubuntu_cluster_network
