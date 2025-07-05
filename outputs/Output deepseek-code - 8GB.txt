@@ -1,0 +1,31 @@
+
+Sure, here is an example of how you might set this up using Docker Compose:
+
+```yaml
+version: '3'
+services:
+  web:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+  
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata: {}
+```
+This file sets up two services, `web` and `db`. The `web` service runs an NGINX web server on port 80 and uses a custom NGINX configuration stored in the current directory (you'll      
+need to create this file yourself). The `db` service runs a PostgreSQL database with a username of "postgres" and password of "secret".
+
+Please make sure you replace the above POSTGRES_PASSWORD and other sensitive information with your own.
+
+Also, please note that NGINX configuration can be complex depending on your needs. This example assumes that you have an existing NGINX config file in the same directory as this        
+docker-compose file. You'll need to replace `./nginx.conf` with the path to your actual nginx.conf if it is located somewhere else.

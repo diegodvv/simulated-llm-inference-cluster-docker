@@ -1,0 +1,43 @@
+Docker Compose File:
+
+```yaml
+version: "3.7"
+
+services:
+  db:
+    image: postgres:12-alpine
+    restart: always
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    command: bundle exec rails server -p $PORT -b $BUILD_PROCESS_KEY --port $PORT
+    ports:
+      - "3000:$PORT"
+    volumes:
+      - ./:/app
+      - ~/.rbenv/plugins/ruby-build.gem:/usr/local/bin/ruby-build
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      ENVIRONMENT: "production"
+      DATABASE_URL: "postgresql://postgres@db/myapp"
+
+volumes:
+  db: {}
+```
+
+Explanation:
+
+1. `version`: Version of Docker Compose to use (here is latest `3.7`).
+2. `services`: Defines the services within the compose file (`db` and `app`).
+   - `db` image: Downloads, builds and starts a Postgres database container (from image `postgres:12-alpine`) with default settings.
+   - `volumes`: Volumes are directories that are shared between containers (i.e. They are mounted). Here, we have mounted our `/var/lib/postgresql` directory as `/app/db`, which        
+will be used by the `app` container to store Postgres' data (including logs, etc.).
+   - `command`: A list of command-line arguments for running rails server with the default settings. `bundle exec rails server -p $PORT -b $BUILD_PROCESS_KEY --port $PORT` runs
+Rails with Postgres (from `/usr/local/bin/ruby-build`) and sets up a basic SSL certificate (with default settings).
+   - `ports`: Maps port numbers to container ports (in this case, 3000 maps to 80).
+   - `environment`: Environment variables that can be set in the image or during build time. Here, we've defined an environment variable named `ENVIRONMENT` with a value of 
+"production".
+3. `db`: Volumes (from previous section) and environment variables (defined in previous section).
+

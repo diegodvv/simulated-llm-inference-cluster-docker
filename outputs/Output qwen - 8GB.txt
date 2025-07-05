@@ -1,0 +1,91 @@
+Certainly! Below is an example of a `docker-compose.yml` file that sets up an Nginx       
+server and a PostgreSQL database in separate Docker containers.
+
+```yaml
+version: '3.8'
+
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/html:/usr/share/nginx/html
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: exampleuser
+      POSTGRES_PASSWORD: examplepass
+      POSTGRES_DB: exampledb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+```
+
+### Explanation:
+
+- **Version**: Specifies the Docker Compose file format version.
+- **web** service:
+  - Uses the `nginx:latest` image.
+  - Maps port 80 of the host to port 80 of the container, allowing you to access the      
+Nginx server via your local machine's web browser.
+  - Mounts two volumes: one for the Nginx configuration files and another for 
+serving static content from a directory on your host (e.g., `./nginx/html`).
+  - Depends on the `db` service so that Nginx starts only after PostgreSQL is up and      
+running.
+- **db** service:
+  - Uses the `postgres:13` image to run PostgreSQL version 13.
+  - Sets environment variables for the database user, password, and database name.
+  - Mounts a volume to persist data (`pgdata`).
+  
+### Directory Structure (assuming you are running this in a directory named 
+`docker-compose`):
+
+```
+docker-compose/
+├── nginx/
+│   ├── conf.d/
+│   │   └── default.conf
+│   └── html/
+└── docker-compose.yml
+```
+
+### Example Nginx Configuration (`nginx/conf.d/default.conf`):
+
+```nginx
+server {
+    listen 80;
+    server_name localhost;
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+    }
+
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+}
+```
+
+### Running the Docker Compose Stack:
+
+To run this stack, navigate to the directory containing `docker-compose.yml` and
+execute:
+
+```sh
+docker-compose up -d
+```
+
+This command will start both services in detached mode.
+
+You can access your Nginx server by navigating to `http://localhost` (or the IP
+address of your host if you're running it on a different machine). The database
+should be available at `postgresql://exampleuser:examplepass@localhost/exampledb`.

@@ -1,0 +1,29 @@
+Docker Compose File:
+
+```yaml
+version: "3"
+
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - postgres:postgres
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresqldata:/var/lib/postgresql/data
+volumes:
+  postgresqldata:
+```
+
+In this example, the `postgres` container is configured to communicate with its own `postgresqldata` volume (which is mounted as a separate directory within the container). The         
+`web` service listens on port `80`, while the `nginx.conf` file contains the configuration for NGINX. The `depends_on` section specifies that the `postgres` container needs to be       
+started before starting the `web` service.

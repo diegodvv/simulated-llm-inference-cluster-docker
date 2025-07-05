@@ -1,0 +1,37 @@
+ Here is a simple example of a Docker Compose file that sets up an Nginx server with a PostgreSQL database. This setup assumes you have the Docker and Docker Compose installed on       
+your system.
+
+```yaml
+version: '3'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+
+  web:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - db
+    restart: always
+```
+
+In this example:
+
+1. The `db` service uses the official PostgreSQL image and sets up a user, password, and database for our application. It also opens port 5432 (the default PostgreSQL port) on 
+your host machine.
+
+2. The `web` service runs the Nginx server with the configuration located at `./nginx.conf` in the current directory. It also forwards the host's port 80 to the container's port        
+80.
+
+3. The `web` service depends on the `db` service, meaning that it will not start until the PostgreSQL server is up and running.
+
+4. Both services are set to restart automatically if they crash for some reason.

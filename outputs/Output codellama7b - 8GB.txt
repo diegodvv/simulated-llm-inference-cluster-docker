@@ -1,0 +1,28 @@
+```
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_URL: postgres://user:password@db/database
+    volumes:
+      - .:/app
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
+```
+This docker-compose file defines two services: web and db. The web service is built       
+from the current directory (.), it exposes port 80, depends on the db service, and        
+sets up environment variables for the Postgres URL. The db service uses an image of       
+the latest Postgres version and sets up environment variables for the Postgres user,      
+password, and database name.
+
+The volume `- .:/app` mounts the current directory (.) into the container's /app
+directory, allowing you to access the application code from inside the container.
